@@ -610,7 +610,7 @@ interface RevGame {
 }
 
 function revOf(g: RevGame, k: RevMonth): number | undefined {
-  return (g as Record<string, number | undefined>)[k];
+return g[k];
 }
 
 function fmtM(n: number): string {
