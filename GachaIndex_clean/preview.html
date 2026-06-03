@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gacha Production Pipeline — Preview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .shimmer {
+      background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    select {
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2371717a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-zinc-950 text-zinc-50 p-4 md:p-8">
+
+  <div class="max-w-7xl mx-auto">
+    <!-- ── Header ── -->
+    <header class="mb-8 space-y-6">
+      <div class="border-b border-zinc-800 pb-6">
+        <h1 class="text-3xl md:text-4xl font-black tracking-tight text-white mb-2">GACHA PRODUCTION PIPELINE</h1>
+        <p class="text-xs text-zinc-400">Database: <span class="text-zinc-200 font-mono">07/20/2025</span></p>
+      </div>
+
+      <!-- Search -->
+      <div class="w-full">
+        <input
+          type="text"
+          placeholder="Filter titles..."
+          class="w-full bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-lg px-4 py-3 text-sm outline-none"
+        />
+      </div>
+
+      <div class="space-y-4">
+        <!-- Platform filter -->
+        <div>
+          <label class="block text-xs font-black tracking-wider text-zinc-400 uppercase mb-2">Platform</label>
+          <div class="flex flex-wrap gap-2" id="platform-filters">
+            <!-- injected by JS -->
+          </div>
+        </div>
+
+        <!-- Status filter -->
+        <div>
+          <label class="block text-xs font-black tracking-wider text-zinc-400 uppercase mb-2">Status</label>
+          <div class="flex flex-wrap gap-2" id="status-filters">
+            <!-- injected by JS -->
+          </div>
+        </div>
+
+        <!-- Gameplay + Environment -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-black tracking-wider text-zinc-400 uppercase mb-2">Gameplay</label>
+            <select class="w-full bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm outline-none">
+              <option>All Gameplay</option>
+              <option>Real-time</option>
+              <option>Turn-Based</option>
+              <option>Rhythm</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-black tracking-wider text-zinc-400 uppercase mb-2">Environment</label>
+            <select class="w-full bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm outline-none">
+              <option>All Environments</option>
+              <option>3D Environment</option>
+              <option>Stage-Based</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sort -->
+        <div class="flex gap-3">
+          <select class="flex-1 bg-zinc-900 text-zinc-100 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm outline-none">
+            <option>Release: Soonest First</option>
+            <option>Release: Furthest First</option>
+            <option>Name: A → Z</option>
+            <option>Name: Z → A</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="text-xs text-zinc-400 font-mono" id="count-label">16 of 16 games</div>
+    </header>
+
+    <!-- ── Game Grid ── -->
+    <main>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="game-grid">
+        <!-- injected by JS -->
+      </div>
+    </main>
+  </div>
+
+<script>
+const GAMES = [
+  { id: 'cookie-run-new-world',            name: 'Cookie Run: New World',               developer: 'Devsisters',                   environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS','PlayStation'],        releaseDate: '2029 [Confirmed]', image: 'https://img.youtube.com/vi/bYsYPPE-w9Q/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=bYsYPPE-w9Q',  gameplayUrl: 'https://www.youtube.com/watch?v=bYsYPPE-w9Q',  preRegUrl: 'https://www.ign.com/games/cookierun-new-world' },
+  { id: 'varsapura',                        name: 'Varsapura',                           developer: '',                             environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS'],                     releaseDate: 'TBA',             image: 'https://img.youtube.com/vi/IeoD_kxvNR8/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=IeoD_kxvNR8',  gameplayUrl: 'https://www.youtube.com/watch?v=ZQFNc_aqEaI',  preRegUrl: '' },
+  { id: 'lord-of-mysteries',               name: 'Lord of Mysteries',                   developer: '',                             environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS'],                     releaseDate: '2026 [Confirmed]', image: 'https://img.youtube.com/vi/6kkOBCz33fg/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=6kkOBCz33fg',  gameplayUrl: 'https://www.youtube.com/watch?v=ZZrORTsEZ4A',  preRegUrl: '' },
+  { id: 'abyss-knights',                   name: 'Abyss Knights',                       developer: '',                             environment: 'Stage-Based',    gameplay: 'Real-time', platforms: ['PC','Android','iOS'],                     releaseDate: 'TBA',             image: 'https://img.youtube.com/vi/Ub0uFrzXCXY/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=Ub0uFrzXCXY',  gameplayUrl: 'https://www.youtube.com/watch?v=Ub0uFrzXCXY',  preRegUrl: 'https://www.taptap.cn/' },
+  { id: 'ananta',                          name: 'Ananta (Project Mugen)',               developer: 'NetEase Games',                environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS','PlayStation'],        releaseDate: 'TBA',             image: 'https://img.youtube.com/vi/WpoGP7gqkFs/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=WpoGP7gqkFs',  gameplayUrl: 'https://www.youtube.com/watch?v=716eb1ruka4',  preRegUrl: '' },
+  { id: 'aniimo',                          name: 'aniimo',                              developer: 'Pawprint Studio',              environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS','Xbox','PlayStation'], releaseDate: '2026 [Confirmed]', image: 'https://img.youtube.com/vi/LYbphU-J2j8/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=LYbphU-J2j8',  gameplayUrl: 'https://www.youtube.com/watch?v=LYbphU-J2j8',  preRegUrl: 'https://www.aniimo.com/m' },
+  { id: 'hypnosync',                       name: 'HYPNOSYNC',                           developer: 'BASED KICK',                  environment: 'Stage-Based',    gameplay: 'Rhythm',    platforms: ['PC'],                                    releaseDate: '2026 [Confirmed]', image: 'https://img.youtube.com/vi/xrnXN5_cyes/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=xrnXN5_cyes',  gameplayUrl: 'https://www.youtube.com/watch?v=xrnXN5_cyes',  preRegUrl: 'https://store.steampowered.com/app/2986590/HYPNOSYNC/' },
+  { id: 'honkai-nexus-anima',              name: 'Honkai: Nexus Anima',                 developer: 'miHoYo / HoYoverse',          environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS'],                     releaseDate: 'TBA',             image: 'https://img.youtube.com/vi/EvKCyJ64WuE/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=EvKCyJ64WuE',  gameplayUrl: 'https://www.youtube.com/watch?v=V5FV_6jirKU',  preRegUrl: 'https://hna.hoyoverse.com/' },
+  { id: 'honor-of-kings-world',            name: 'Honor of Kings: World',               developer: 'TiMi Studio Group',           environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS','Xbox','PlayStation'], releaseDate: 'TBA',             image: 'https://img.youtube.com/vi/36rR4rB_TYw/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=36rR4rB_TYw',  gameplayUrl: 'https://www.youtube.com/watch?v=gONX1LzZMXw',  preRegUrl: 'https://honorofkingsworld.com' },
+  { id: 'bang-dream-our-notes',            name: 'BanG Dream! Our Notes',               developer: 'Bilibili Game',               environment: 'Stage-Based',    gameplay: 'Rhythm',    platforms: ['Android','iOS'],                          releaseDate: '2026 [Confirmed]', image: 'https://img.youtube.com/vi/mMk-L_jascw/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=mMk-L_jascw',  gameplayUrl: 'https://www.youtube.com/watch?v=mMk-L_jascw',  preRegUrl: 'https://bdon.biligames.com/?lang=en-us' },
+  { id: 'my-hero-academia-united-survival',name: 'My Hero Academia UNITED SURVIVAL',    developer: 'KLab Inc. / gumi Inc.',       environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS'],                     releaseDate: '2026 [Confirmed]', image: 'https://img.youtube.com/vi/Vfk88MPic_4/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=Vfk88MPic_4',  gameplayUrl: 'https://www.youtube.com/watch?v=Vfk88MPic_4',  preRegUrl: 'https://x.com/MHA_HS_en' },
+  { id: 'sea-of-remnants',                 name: 'sea of remnants',                     developer: '',                             environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS','PlayStation'],        releaseDate: 'TBA',             image: 'https://img.youtube.com/vi/LB1wMfVlVSY/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=LB1wMfVlVSY',  gameplayUrl: 'https://www.youtube.com/watch?v=LB1wMfVlVSY',  preRegUrl: '' },
+  { id: 'monster-hunter-outlanders',       name: 'Monster Hunter Outlanders',           developer: 'TiMi Studio Group / Capcom',  environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS'],                     releaseDate: 'TBA',             image: 'https://img.youtube.com/vi/5gv7oMnUhnw/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=5gv7oMnUhnw',  gameplayUrl: 'https://www.youtube.com/watch?v=tZNpaoTlI8Y',  preRegUrl: 'https://monsterhunteroutlanders.com' },
+  { id: 'unending-dawn',                   name: 'Unending Dawn',                       developer: 'ToallGames',                  environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS','PlayStation'],        releaseDate: '2026 [Confirmed]', image: 'https://img.youtube.com/vi/OvD4q6-5ElY/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=OvD4q6-5ElY',  gameplayUrl: 'https://www.youtube.com/watch?v=OvD4q6-5ElY',  preRegUrl: 'https://www.youtube.com/@UnendingDawn-e8o' },
+  { id: 'digimon-alysion',                 name: 'DIGIMON ALYSION',                     developer: 'Bandai Namco',                environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS'],                     releaseDate: '2026 [Confirmed]', image: 'https://img.youtube.com/vi/iznObr5Euo0/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=iznObr5Euo0',  gameplayUrl: 'https://www.youtube.com/watch?v=iznObr5Euo0',  preRegUrl: 'https://www.reddit.com/r/DigimonCardGame2020/' },
+  { id: 'solo-leveling-karma',             name: 'Solo Leveling: KARMA',                developer: 'Netmarble Neo',               environment: '3D Environment', gameplay: 'Real-time', platforms: ['PC','Android','iOS'],                     releaseDate: '2026 [Confirmed]', image: 'https://img.youtube.com/vi/rD8Ppn5DiGE/maxresdefault.jpg', trailerUrl: 'https://www.youtube.com/watch?v=rD8Ppn5DiGE',  gameplayUrl: 'https://www.youtube.com/watch?v=rD8Ppn5DiGE',  preRegUrl: 'https://sololeveling-karma.netmarble.com/en' },
+];
+
+const AVATAR_COLORS = ['#7F77DD','#1D9E75','#D85A30','#E4533D','#0088DD','#639922','#BA7517','#993556'];
+
+function avatarColor(name) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash << 5) - hash + name.charCodeAt(i);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function isRealUrl(url) {
+  return Boolean(url) && !url.includes('/results?search_query=') && !url.includes('google.com/search');
+}
+
+// ── Filter state ──────────────────────────────────────────────────────────────
+let platformFilter = 'All';
+let statusFilter = 'All';
+
+function getFiltered() {
+  return GAMES.filter(g => {
+    const confirmed = g.releaseDate.includes('[Confirmed]');
+    const mp = platformFilter === 'All' || g.platforms.includes(platformFilter);
+    const ms = statusFilter === 'All' || (statusFilter === 'Confirmed' && confirmed) || (statusFilter === 'TBA' && !confirmed);
+    return mp && ms;
+  });
+}
+
+// ── Render helpers ────────────────────────────────────────────────────────────
+function renderPlatformPills() {
+  const platforms = ['All', 'PC', 'Android', 'iOS', 'PlayStation', 'Xbox'];
+  return platforms.map(p => {
+    const active = platformFilter === p;
+    const cls = active
+      ? 'bg-[#0088DD] border-[#0088DD] text-white'
+      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200';
+    return `<button onclick="setPlatform('${p}')" class="px-4 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer ${cls}">${p}</button>`;
+  }).join('');
+}
+
+function renderStatusPills() {
+  const opts = [
+    { label: 'All',       active: 'bg-[#0088DD] border-[#0088DD] text-white' },
+    { label: 'Confirmed', active: 'bg-emerald-600 border-emerald-600 text-white' },
+    { label: 'TBA',       active: 'bg-amber-600 border-amber-600 text-white' },
+  ];
+  return opts.map(({ label, active }) => {
+    const isActive = statusFilter === label;
+    const cls = isActive ? active : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200';
+    return `<button onclick="setStatus('${label}')" class="px-4 py-2 rounded-full text-xs font-semibold border transition-all cursor-pointer ${cls}">${label}</button>`;
+  }).join('');
+}
+
+function renderCard(game) {
+  const confirmed = game.releaseDate.includes('[Confirmed]');
+  const displayDate = game.releaseDate.replace(' [Confirmed]', '');
+  const color = avatarColor(game.name);
+  const inits = initials(game.name);
+
+  const imageHtml = game.image
+    ? `<img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-white font-black text-3xl\\' style=\\'background-color:${color}\\'>${inits}</div>'" />`
+    : `<div class="w-full h-full flex items-center justify-center text-white font-black text-3xl" style="background-color:${color}">${inits}</div>`;
+
+  const badgeClass = confirmed
+    ? 'bg-emerald-900/50 border-emerald-700/60 text-emerald-300'
+    : 'bg-amber-900/30 border-amber-700/40 text-amber-400';
+
+  const dateBoxClass = confirmed
+    ? 'bg-emerald-950/60 border-emerald-800/50'
+    : 'bg-amber-950/40 border-amber-800/30';
+  const dateTextClass = confirmed ? 'text-emerald-300' : 'text-amber-400';
+  const statusTextClass = confirmed ? 'text-emerald-500' : 'text-amber-500';
+  const statusLabel = confirmed ? 'CONFIRMED' : 'TBA';
+
+  const links = [
+    { label: 'Trailer',  url: game.trailerUrl,  cls: 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700' },
+    { label: 'Gameplay', url: game.gameplayUrl, cls: 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700' },
+    { label: 'Pre-Reg',  url: game.preRegUrl,   cls: 'bg-[#0088DD] text-white hover:bg-[#0066AA]' },
+  ].filter(l => isRealUrl(l.url));
+
+  const colsClass = links.length === 3 ? 'grid-cols-3' : links.length === 2 ? 'grid-cols-2' : 'grid-cols-1';
+  const linksHtml = links.length > 0
+    ? `<div class="grid ${colsClass} gap-2">${links.map(l =>
+        `<a href="${l.url}" target="_blank" rel="noopener noreferrer" class="${l.cls} py-2.5 rounded-lg text-center text-xs font-bold transition">${l.label}</a>`
+      ).join('')}</div>`
+    : `<p class="text-center text-xs text-zinc-600 py-1">No links yet</p>`;
+
+  const platformBadges = game.platforms
+    .map(p => `<span class="bg-zinc-800 text-zinc-300 text-[10px] px-2 py-0.5 rounded font-mono font-bold">${p}</span>`)
+    .join('');
+
+  return `
+    <article class="bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl overflow-hidden flex flex-col hover:border-zinc-700 transition-all">
+      <div class="relative w-full h-40 bg-zinc-800 overflow-hidden rounded-t-xl">${imageHtml}</div>
+      <div class="p-5 space-y-4 flex-1 flex flex-col">
+        <div>
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h2 class="text-base font-bold text-zinc-100 line-clamp-2">${game.name}</h2>
+            <span class="shrink-0 text-[10px] font-black px-2 py-1 rounded border ${badgeClass}">${confirmed ? '✓' : '?'}</span>
+          </div>
+          ${game.developer ? `<p class="text-[11px] font-semibold text-zinc-400 mb-1">${game.developer}</p>` : ''}
+          <p class="text-xs text-zinc-500">${game.environment} · ${game.gameplay}</p>
+        </div>
+        <div class="flex flex-wrap gap-1">${platformBadges}</div>
+        <div class="flex-1"></div>
+        <div class="space-y-3 pt-3 border-t border-zinc-800">
+          <div class="p-2.5 rounded-lg border flex items-center justify-between gap-2 ${dateBoxClass}">
+            <span class="text-sm font-black ${dateTextClass}">${displayDate}</span>
+            <span class="text-[10px] font-black tracking-wider ${statusTextClass}">${statusLabel}</span>
+          </div>
+          ${linksHtml}
+        </div>
+      </div>
+    </article>`;
+}
+
+function render() {
+  const filtered = getFiltered();
+  document.getElementById('platform-filters').innerHTML = renderPlatformPills();
+  document.getElementById('status-filters').innerHTML = renderStatusPills();
+  document.getElementById('count-label').textContent = `${filtered.length} of ${GAMES.length} games`;
+  document.getElementById('game-grid').innerHTML = filtered.length > 0
+    ? filtered.map(renderCard).join('')
+    : `<div class="col-span-full text-center py-20 border-2 border-dashed border-zinc-800 rounded-xl">
+        <p class="text-zinc-500 font-bold">No games match your filters</p>
+       </div>`;
+}
+
+function setPlatform(p) { platformFilter = p; render(); }
+function setStatus(s)   { statusFilter = s; render(); }
+
+render();
+</script>
+</body>
+</html>
