@@ -610,7 +610,7 @@ interface RevGame {
 }
 
 function revOf(g: RevGame, k: RevMonth): number | undefined {
-return g[k];
+  return g[k];
 }
 
 function fmtM(n: number): string {
@@ -894,7 +894,7 @@ const RevenueTab = () => {
             const shownChange = cmpMonth ? cmpDelta : row.change;
             const meta = GAME_META[row.game] ?? {};
 
-            const sparkMax = Math.max(...REV_MONTHS.map(m => revOf(row as RevGame, m.key) ?? 0), 1);
+            const sparkMax = Math.max(...REV_MONTHS.map(m => revOf(row, m.key) ?? 0), 1);
 
             return (
               <div key={row.game}>
@@ -964,7 +964,7 @@ const RevenueTab = () => {
                     <p className="text-[9px] text-zinc-600 font-mono uppercase tracking-widest mb-3">Revenue history — all months</p>
                     <div className="flex items-end gap-2">
                       {REV_MONTHS.map(({ key, label }) => {
-                        const v = revOf(row as RevGame, key);
+                        const v = revOf(row, key);
                         const h = v !== undefined ? Math.max(6, Math.round((v / sparkMax) * 72)) : 0;
                         const isActive = key === month;
                         return (
